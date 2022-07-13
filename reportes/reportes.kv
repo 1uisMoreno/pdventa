@@ -1,0 +1,419 @@
+#:import hex kivy.utils.get_color_from_hex
+
+<LabelOscuro@Label>:
+    canvas.before:
+        Color:
+            rgba: hex('#21618C')
+        Rectangle:
+            size: self.size
+            pos: self.pos
+#------------------------------------------------------------------------------------------------------------------------------------------------
+
+<RV_reportes_ventas>:
+    SelectableRecycleBoxLayout:
+        spacing: 1
+        default_size: None, dp(35)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: True
+
+<SelectableReporteVentasLabel>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: hex('C9F3EF') if self.selected else hex('#F0F0F0')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: _idVenta
+        size_hint_x: .19
+        color: hex('000000')
+    Label:
+        id: _idUsuario
+        size_hint_x: .18
+        color: hex('000000')
+    Label:
+        id: _productosVendidos
+        size_hint_x: .13
+        color: hex('000000')
+    Label:
+        id: _total
+        size_hint_x: .12
+        color: hex('000000')
+    Label:
+        id: _fecha
+        size_hint_x: .19
+        color: hex('000000')
+    Label:
+        id: _hora
+        size_hint_x: .19
+        color: hex('000000')
+
+
+#------------------------------------------------------------------------------------------------------------------------------------------------
+
+<RV_detalles>:
+    SelectableRecycleBoxLayout:
+        spacing: 1
+        default_size: None, dp(35)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: True
+
+<SelectableDatallesLabel>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: hex('#F0F0F0')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: _idDetalle
+        size_hint_x: .08
+        color: hex('000000')
+    Label:
+        id: _idVenta
+        size_hint_x: .08
+        color: hex('000000')
+    Label:
+        id: _codigo
+        size_hint_x: .14
+        color: hex('000000')
+    Label:
+        id: _nombre
+        size_hint_x: .4
+        color: hex('000000')
+    Label:
+        id: _precioIndividual
+        size_hint_x: .1
+        color: hex('000000')
+    Label:
+        id: _cantidad
+        size_hint_x: .1
+        color: hex('000000')
+    Label:
+        id: _total
+        size_hint_x: .1
+        color: hex('000000')
+
+<VentanaDetalles>:
+    size_hint: .6, .5
+    title: 'Detalles de la venta'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 5
+        spacing: 2
+        BoxLayout:
+            spacing: 1
+            size_hint_y: .1
+            LabelOscuro:
+                text: 'idDetalle'
+                size_hint_x: .08
+            LabelOscuro:
+                text: 'idVenta'
+                size_hint_x: .08
+            LabelOscuro:
+                text: 'Codigo'
+                size_hint_x: .14
+            LabelOscuro:
+                text: 'Nombre'
+                size_hint_x: .4
+            LabelOscuro:
+                text: 'Precio'
+                size_hint_x: .1
+            LabelOscuro:
+                text: 'Cantidad'
+                size_hint_x: .1
+            LabelOscuro:
+                text: 'Total'
+                size_hint_x: .1
+        RV_detalles:
+            size_hint_y: .95
+            id: rv_detalles
+            viewclass: 'SelectableDatallesLabel'
+
+#------------------------------------------------------------------------------------------------------------------------------------------------
+
+<ReportesWindow>:
+    orientation: 'vertical'
+    BoxLayout:
+        size_hint_y: .1
+        canvas.before:
+            Color:
+                rgba: hex('2980B9')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            size_hint_x: .08
+            Image: 
+                source: 'img/LogoCuadrado.png' 
+        BoxLayout:
+            size_hint_x: .30 
+        Label:
+            size_hint_x: .22
+            text: 'Reportes'
+            font_size: 28
+        BoxLayout: 
+            size_hint_x: .28
+        Button:
+            background_normal: ''
+            background_color: hex('DD0000')
+            size_hint_x: .12
+            font_size: 22
+            text: 'Cerrar Sesión'
+            on_release: root.cerrarSesion()
+    BoxLayout:
+        size_hint_y: .83
+        canvas.before:
+            Color:
+                rgba: hex('FFFFFF')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            size_hint_x: .2
+            canvas.before:
+                Color:
+                    rgba: hex('EEEEEE')
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            orientation: 'vertical'
+            spacing: 15
+            padding: 8
+            BoxLayout:
+                spacing: 5
+                size_hint_y: .30
+                orientation: 'vertical'
+                BoxLayout:
+                    size_hint_y: .5
+                    spacing: 5
+                    Button:
+                        text: 'Inventario'
+                        color: hex('000000')
+                        font_size: 25
+                        background_normal: ''
+                        background_color: hex('#00A5B1')
+                        on_release: root.inventario()
+                    Button:
+                        color: hex('000000')
+                        font_size: 25
+                        text: 'Usuarios'
+                        background_normal: ''
+                        background_color: hex('#00A5B1')
+                        on_release: root.usuarios()
+                Button:
+                    size_hint_y: .5
+                    color: hex('000000')
+                    font_size: 25
+                    text: 'Ventas'
+                    background_normal: ''
+                    background_color: hex('#FFE818')
+                    on_release: root.ventas()
+            BoxLayout:
+                size_hint_y: .05
+                Label:
+                    text: 'Notificaciones'
+                    color: hex('DD0000')
+                    font_size: 18   
+            BoxLayout:
+                size_hint_y: .07
+                spacing: 10
+                Button:
+                    size_hint_x: 3
+                    text: 'Fecha'
+                    font_size: 18
+                    background_normal: ''
+                    background_color: hex('000000')
+                TextInput:
+                    size_hint_x: 7
+                    font_size: 15
+                    id: fechaUnicaVentanaReportes
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+                    on_text_validate: root.cargarVentasRV('Dia')         
+            BoxLayout:
+                size_hint_y: .18
+                spacing: 10
+                Button:
+                    size_hint_x: 3
+                    text: 'Rango \n   de \nFechas'
+                    font_size: 18
+                    background_normal: ''
+                    background_color: hex('000000')
+                BoxLayout:
+                    size_hint_x: 7
+                    orientation: 'vertical'
+                    spacing: 3
+                    TextInput:
+                        size_hint_y: .4 
+                        font_size: 15
+                        id: rangoFechaInicioVentanaReportes
+                        write_tab: False
+                        multiline: False
+                        padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                        halign: "center"
+                        on_text_validate: root.cargarVentasRV('Rango')  
+                    BoxLayout:
+                        size_hint_y: .2
+                        BoxLayout:
+                            size_hint_x: .45
+                        BoxLayout:
+                            size_hint_x: .10
+                            padding: 5
+                            orientation: 'vertical'
+                            canvas.before:
+                                Color:
+                                    rgba: hex('000000')
+                                Rectangle:
+                                    size: self.size
+                                    pos: self.pos
+                            BoxLayout:
+                            BoxLayout:
+                                canvas.before:
+                                    Color:
+                                        rgba: hex('FFFFFF')
+                                    Rectangle:
+                                        size: self.size
+                                        pos: self.pos
+                            BoxLayout:
+                        BoxLayout:
+                            size_hint_x: .45
+                    TextInput:
+                        size_hint_y: .4
+                        font_size: 15
+                        id: rangoFechaFinVentanaReportes
+                        write_tab: False
+                        multiline: False
+                        padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                        halign: "center"
+                        on_text_validate: root.cargarVentasRV('Rango')     
+            Button:
+                size_hint_y: .09
+                text: 'Detalles'
+                font_size: 20
+                background_normal: ''
+                background_color: hex('000000')
+                on_release: root.ventanaDetalles()
+            Button:
+                size_hint_y: .15
+                text: 'Guardar en CSV'
+                font_size: 20
+                background_normal: ''
+                background_color: hex('000000')
+            Button:
+                size_hint_y: .15
+                text: 'Guardar en PDF'
+                font_size: 20
+                background_normal: ''
+                background_color: hex('000000')
+            BoxLayout:
+                size_hint_y: .01
+        BoxLayout:
+            size_hint_x: .8
+            orientation: 'vertical'
+            padding: 5
+            spacing: 2
+            canvas.before:
+                Color:
+                    rgba: hex('FFFFFF')
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            BoxLayout: 
+                size_hint_y: .1
+                padding: 5
+                canvas.before:
+                    Color:
+                        rgba: hex('2980B9')
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                BoxLayout:
+                    size_hint_x: .02
+                Label:
+                    size_hint_x: .07
+                    id: fechaLabel
+                    text: 'Fechas: '
+                    font_size: 20
+                Label:
+                    size_hint_x: .1
+                    id: labelFechaInicial
+                    text: ''
+                    font_size: 20
+                Label:
+                    size_hint_x: .04
+                    id: separadorFechas
+                    text: '--'
+                    font_size: 20
+                Label:
+                    size_hint_x: .1
+                    id: labelFechaFinal
+                    text: ''
+                    font_size: 20
+                BoxLayout:
+                    size_hint_x: .1
+                Label:
+                    size_hint_x: .1
+                    text: 'Total vendido: '
+                    font_size: 20
+                Label:
+                    size_hint_x: .1
+                    id: labelTotalVendido
+                    text: ''
+                    font_size: 20
+                BoxLayout:
+                    size_hint_x: .1
+                BoxLayout:
+                    size_hint_x: .25
+                    Button:
+                        background_normal: ''
+                        background_color: hex('FFFFFF')
+                        font_size: 18
+                        text: 'Observaciones'
+                        color: hex('000000')
+                        on_release: root.observaciones()
+            BoxLayout:
+                size_hint_y: .05
+                spacing: 2
+                LabelOscuro:
+                    text: 'ID venta'
+                    size_hint_x: .19
+                LabelOscuro:
+                    text: 'ID usuario'
+                    size_hint_x: .18
+                LabelOscuro:
+                    text: 'Productos vendidos'
+                    size_hint_x: .13
+                LabelOscuro:
+                    text: 'Total'
+                    size_hint_x: .12
+                LabelOscuro:
+                    text: 'Fecha'
+                    size_hint_x: .19
+                LabelOscuro:
+                    text: 'Hora'
+                    size_hint_x: .19
+            RV_reportes_ventas:
+                size_hint_y: .85
+                id: rv_reportes_ventas
+                viewclass: 'SelectableReporteVentasLabel'
+    BoxLayout:
+        size_hint_y: .07
+        canvas.before:
+            Color:
+                rgba: hex('2980B9')
+            Rectangle:
+                size: self.size
+                pos: self.pos

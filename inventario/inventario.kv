@@ -1,0 +1,480 @@
+#:import hex kivy.utils.get_color_from_hex
+
+<BotonNegro@Button>:
+    background_normal: ''
+    background_color: hex('#2980B9')  
+    markup: True
+    ltext: ""
+    rtext: ""
+ 
+<LabelOscuro@Label>:
+    canvas.before:
+        Color:
+            rgba: hex('#21618C')
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+
+# ---------------------------------------------------------------------------------------------------------------------------------
+<RV_categorias>:
+    SelectableRecycleBoxLayout:
+        spacing: 2
+        default_size: None, dp(30)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: True
+
+<SelectableCategoriasLabel>:
+    canvas.before:
+        Color:
+            rgba: hex('C9F3EF') if self.selected else hex('#F0F0F0')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: _idCategoria
+        size_hint_x: .35
+        color: hex('000000')
+    Label:
+        id: _Categoria
+        size_hint_x: .65
+        color: hex('000000')
+
+<VentanaCategorias>:
+    size_hint: .22, .3
+    title: 'Agregar Categoria'
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 2
+        BoxLayout:
+            size_hint_y: .75
+            orientation: 'vertical'
+            BoxLayout: 
+                size_hint_y: .2
+                Label:
+                    id: notificacionVentanaCategorias
+                    text: ''
+            BoxLayout:
+                size_hint_y: .3
+                spacing: 2
+                TextInput:
+                    size_hint_x: .5
+                    font_size: 15
+                    id: idCategoriaVentanaCategorias
+                    hint_text: 'ID de Categoria'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+                TextInput:
+                    size_hint_x: .5
+                    font_size: 15
+                    id: categoriaVentanaCategorias
+                    hint_text: 'Categoria'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+            BoxLayout:
+                size_hint_y: .4
+                BoxLayout:
+                    size_hint_x: .1
+                Label:
+                    size_hint_x: .4
+                    id: label_temporalidadVentanaCategorias
+                    text: 'Temporalidad: '
+                BoxLayout:
+                    size_hint_x: .2
+                    Label:
+                        id: label_Si_TemporalidadVentanaCategorias
+                        text: 'Si'
+                    CheckBox:
+                        group: "temporalidad"
+                        id: si_temporalidadValueCheckbox
+                BoxLayout:
+                    size_hint_x: .2
+                    Label:
+                        id: label_No_TemporalidadVentanaCategorias
+                        text: 'No'
+                    CheckBox:
+                        group: "temporalidad"
+                        id: no_temporalidadValueCheckbox
+                BoxLayout:
+                    size_hint_x: .1
+            BoxLayout:
+                size_hint_y: .1
+        BoxLayout:
+            size_hint_y: .25
+            spacing: 4
+            BotonNegro:
+                size_hint_x: .5
+                id: boton_Agregar_Modificar_Categoria
+                font_size: 18
+                text: ''
+                #background_color: hex('10AA10')
+                on_release: root.validar(idCategoriaVentanaCategorias.text, categoriaVentanaCategorias.text, si_temporalidadValueCheckbox.active, no_temporalidadValueCheckbox.active)
+            BotonNegro:
+                size_hint_x: .5
+                font_size: 18
+                text: 'Cancelar'
+                #background_color: hex('A0A0A0')
+                on_release: root.dismiss()
+
+
+
+
+<VentanaCategoriasInventario>:
+    size_hint: .3, .7
+    title: 'Categorias'
+    BoxLayout:
+        spacing: 5
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: .05
+            padding: 2
+            spacing: 2
+            LabelOscuro:
+                size_hint_x: .35
+                text: 'No. de Categoria'
+            LabelOscuro:
+                size_hint_x: .65
+                text: 'Categoria'
+        RV_categorias: 
+            padding: 2
+            id: rv_categorias
+            size_hint_y: .65
+            viewclass: 'SelectableCategoriasLabel'
+        BoxLayout:
+            size_hint_y: .3
+            padding: 2
+            spacing: 2
+            orientation: 'vertical'
+            BoxLayout:
+                spacing: 2
+                size_hint_y: .5
+                BotonNegro:
+                    text: 'Agregar Categoria'
+                    on_release: root.agregarCategoria()
+                BotonNegro:
+                    text: 'Cambiar Categoria'
+                    on_release: root.modificarCategoria()
+            Button:
+                size_hint_y: .5
+                text: 'Eliminar Categoria'
+                background_normal: ''
+                background_color: hex('BB0000')
+                on_release: root.eliminarCategoria()
+
+
+
+# ---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+<RV_inventario>:
+    SelectableRecycleBoxLayout:
+        spacing: 1
+        default_size: None, dp(35)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: True
+
+
+<SelectableInventarioLabel>:
+    canvas.before:
+        Color:
+            rgba: hex('C9F3EF') if self.selected else hex('#F0F0F0')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: _codigo
+        size_hint_x: .15
+        color: hex('000000')
+    Label:
+        id: _articulo
+        size_hint_x: .45
+        color: hex('000000')
+    Label:
+        id: _cantidad
+        size_hint_x: .07
+        color: hex('000000')    
+    Label:
+        id: _precio
+        size_hint_x: .07
+        color: hex('000000')    
+    Label:
+        id: _NumDeCategoria
+        size_hint_x: .07
+        color: hex('000000')    
+    Label:
+        id: _Categoria
+        size_hint_x: .20
+        color: hex('000000')
+
+
+<VentanaProductosInventario>:
+    size_hint: .4, .4
+    title: 'Productos'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 5
+        spacing: 8
+        BoxLayout:
+            size_hint_y: .1
+            padding: 3
+            Label:
+                id: notificacionVentanaProductos
+                text: 'Notificacion'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: .45
+            spacing: 2
+            padding_y: 4
+            BoxLayout:
+                size_hint_y: .5
+                spacing: 2
+                TextInput:
+                    padding: 5
+                    size_hint_x: .35
+                    font_size: 15
+                    id: codigoVentanaProductos
+                    hint_text: 'Codigo'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+                TextInput:
+                    size_hint_x: .65
+                    font_size: 15
+                    id: nombreVentanaProductos
+                    hint_text: 'Nombre del Articulo'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+            BoxLayout:
+                size_hint_y: .5
+                spacing: 2
+                TextInput:
+                    size_hint_x: .25
+                    font_size: 15
+                    id: precioVentanaProductos
+                    hint_text: 'Precio'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+                TextInput:
+                    size_hint_x: .25
+                    font_size: 15
+                    id: precioPublicoVentanaProductos
+                    hint_text: 'Precio Publico'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+                TextInput:
+                    size_hint_x: .25
+                    font_size: 15
+                    id: cantidadVentanaProductos
+                    hint_text: 'Cantidad'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+                TextInput:
+                    size_hint_x: .25
+                    font_size: 15
+                    id: numCategoriaVentanaProductos
+                    hint_text: 'No. de Categoria'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+        BoxLayout:
+            size_hint_y: .35
+            spacing: 4
+            BotonNegro:
+                size_hint_x: .5
+                id: botonAgregarProducto
+                font_size: 18
+                text: ''
+                #background_color: hex('10AA10')
+                on_release: root.validar(codigoVentanaProductos.text, nombreVentanaProductos.text, precioVentanaProductos.text, precioPublicoVentanaProductos.text, cantidadVentanaProductos.text, numCategoriaVentanaProductos.text)
+            BotonNegro:
+                size_hint_x: .5
+                font_size: 18
+                text: 'Cancelar'
+                #background_color: hex('A0A0A0')
+                on_release: root.dismiss()
+
+
+# ---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+<InventarioWindow>:
+    orientation: 'vertical'
+    BoxLayout:
+        size_hint_y: .1
+        canvas.before:
+            Color:
+                rgba: hex('2980B9')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            size_hint_x: .08
+            Image: 
+                source: 'img/LogoCuadrado.png' 
+        BoxLayout:
+            size_hint_x: .30 
+        Label:
+            size_hint_x: .22
+            text: 'Inventario'
+            font_size: 28
+        BoxLayout: 
+            size_hint_x: .28
+        Button:
+            background_normal: ''
+            background_color: hex('DD0000')
+            size_hint_x: .12
+            font_size: 22
+            text: 'Cerrar Sesión'
+            on_release: root.cerrarSesion()
+    BoxLayout:
+        size_hint_y: .83
+        canvas.before:
+            Color:
+                rgba: hex('FFFFFF')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            size_hint_x: .20
+            canvas.before:
+                Color:
+                    rgba: hex('EEEEEE')
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            orientation: 'vertical'
+            spacing: 10
+            padding: 8
+            BoxLayout:
+                spacing: 5
+                size_hint_y: .28
+                orientation: 'vertical'
+                BoxLayout:
+                    size_hint_y: .5
+                    spacing: 5
+                    Button:
+                        text: 'Reportes'
+                        color: hex('000000')
+                        font_size: 25
+                        background_normal: ''
+                        background_color: hex('#8C6222')
+                        on_release: root.reportes()
+                    Button:
+                        color: hex('000000')
+                        font_size: 25
+                        text: 'Usuarios'
+                        background_normal: ''
+                        background_color: hex('#00A5B1')
+                        on_release: root.usuarios()
+                Button:
+                    size_hint_y: .5
+                    color: hex('000000')
+                    font_size: 25
+                    text: 'Ventas'
+                    background_normal: ''
+                    background_color: hex('#FFE818')
+                    on_release: root.ventas()
+            Button:
+                size_hint_y: .20
+                background_normal: ''
+                background_color: hex('26a72a')
+                color: hex('FFFFFF')
+                text: 'Agregar Producto'
+                font_size: 28
+                on_release: root.agregarProducto()
+            Button:
+                size_hint_y: .20
+                background_normal: ''
+                background_color: hex('26a72a')
+                color: hex('FFFFFF')
+                text: 'Modificar Producto'
+                font_size: 28
+                on_release: root.modificarProducto()
+            Button:
+                size_hint_y: .20
+                background_normal: ''
+                background_color: hex('26a72a')
+                color: hex('FFFFFF')
+                text: 'Eliminar Producto'
+                font_size: 28
+                on_release: root.eliminarProducto()
+            BoxLayout
+                size_hint_y: .13
+                Button:
+                    background_normal: ''
+                    background_color: hex('000000')
+                    color: hex('FFFFFF')
+                    text: 'Categorias'
+                    font_size: 28
+                    on_release: root.ventanaCategorias()
+
+        BoxLayout:
+            size_hint_x: .80
+            orientation: 'vertical'
+            canvas.before:
+                Color:
+                    rgba: hex('FFFFFF')
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            BoxLayout: 
+                size_hint_y: .05
+                spacing: 2
+                padding: 2
+                LabelOscuro:
+                    text: 'Codigo'
+                    size_hint_x: .15
+                LabelOscuro:
+                    text: 'Articulo'
+                    size_hint_x: .44
+                LabelOscuro:
+                    text: 'Cantidad'
+                    size_hint_x: .07
+                LabelOscuro:
+                    text: 'Precio'
+                    size_hint_x: .07
+                LabelOscuro:
+                    text: 'No. Cat.'
+                    size_hint_x: .07
+                LabelOscuro:
+                    text: 'Categoria'
+                    size_hint_x: .20
+            RV_inventario:
+                id: rv_inventario
+                size_hint_y: .95
+                viewclass: 'SelectableInventarioLabel'
+    BoxLayout:
+        size_hint_y: .07
+        canvas.before:
+            Color:
+                rgba: hex('2980B9')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+    

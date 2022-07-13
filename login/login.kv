@@ -1,0 +1,179 @@
+#:import hex kivy.utils.get_color_from_hex
+<MyTextInput@TextInput>:
+    background_color: 0,0,0,0
+    cursor_color: hex('ffffff')
+    canvas.before:
+        Color:
+            rgba: hex('#ffffff')
+    canvas.after:
+        Color:
+            rgb: hex('#02BC02')
+        Ellipse:
+            angle_start:180
+            angle_end:360
+            pos:(self.pos[0] - self.size[1]/2.0, self.pos[1])
+            size: (self.size[1], self.size[1])
+        Ellipse:
+            angle_start:360
+            angle_end:540
+            pos: (self.size[0] + self.pos[0] - self.size[1]/2.0, self.pos[1])
+            size: (self.size[1], self.size[1])
+        Color:
+            rgba: hex('#02BC02')
+        Line:
+            points: self.pos[0] , self.pos[1], self.pos[0] + self.size[0], self.pos[1]
+        Line:
+            points: self.pos[0], self.pos[1] + self.size[1], self.pos[0] + self.size[0], self.pos[1] + self.size[1]
+        Line:
+            ellipse: self.pos[0] - self.size[1]/2.0, self.pos[1], self.size[1], self.size[1], 180, 360
+        Line:
+            ellipse: self.size[0] + self.pos[0] - self.size[1]/2.0, self.pos[1], self.size[1], self.size[1], 360, 540
+
+<LoginWindow>:
+    canvas.before:
+        Color: 
+            rgba: hex('EEEEEE')
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    orientation: 'vertical'
+    BoxLayout:
+        size_hint_y: .07
+        canvas.before:
+            Color: 
+                rgba: hex('2980B9')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+    BoxLayout:
+        size_hint_y: .86
+        canvas.before:
+            Color: 
+                rgba: hex('FFFFFF')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: .055
+        BoxLayout:
+            size_hint_y: .89
+            canvas.before:
+                Color: 
+                    rgba: hex('FFFFFF')
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            BoxLayout:
+                size_hint_x: .35
+            BoxLayout:
+                size_hint_x: .3
+                canvas.before:
+                    Color:
+                        rgba: hex('EEEEEE')
+                    RoundedRectangle:
+                        pos: self.pos
+                        size: self.size
+                        radius: [(30, 30), (30, 30), (30, 30), (30, 30)]
+                orientation: 'vertical'
+                Label:
+                    text: 'Bienvenido'
+                    font_size: 28
+                    size_hint_y: .12
+                    color: hex('000000')
+                BoxLayout:
+                    size_hint_y: .30
+                    Image: 
+                        source: 'img/LogoCircular.png'
+                BoxLayout:
+                    size_hint_y: .58
+                    orientation: 'vertical'
+                    BoxLayout:
+                        size_hint_y: .18
+                        Label:
+                            id: notificacion_login
+                            text: ''
+                            font_size: 20
+                            color: hex('FF0000')
+                    BoxLayout:
+                        size_hint_y: .37
+                        spacing: 30
+                        orientation: 'vertical'
+                        BoxLayout:
+                            BoxLayout: 
+                                size_hint_x: .20
+                            BoxLayout:
+                                size_hint_x: .60 
+                                canvas.before:
+                                    Color:
+                                        rgba: hex('#02BC02')
+                                    Rectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                MyTextInput:
+                                    halign: "center"
+                                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                                    id: username
+                                    multiline: False
+                                    write_tab: False
+                                    hint_text: 'Usuario'
+                                    font_size: 20
+                                    on_text_validate: root.validarUsuario(self.text, password.text)
+
+                            BoxLayout: 
+                                size_hint_x: .20
+                        BoxLayout:
+                            BoxLayout: 
+                                size_hint_x: .20
+                            BoxLayout:
+                                size_hint_x: .60 
+                                canvas.before:
+                                    Color:
+                                        rgba: hex('#02BC02')
+                                    Rectangle:
+                                        pos: self.pos
+                                        size: self.size
+                                MyTextInput:
+                                    halign: "center"
+                                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                                    id: password
+                                    multiline: False
+                                    write_tab: False
+                                    password: True
+                                    hint_text: 'Contraseña'
+                                    font_size: 20
+                                    on_text_validate: root.validarUsuario(username.text, self.text)
+                            BoxLayout: 
+                                size_hint_x: .20
+                    BoxLayout:
+                        size_hint_y: .17
+                    BoxLayout:
+                        size_hint_y: .15
+                        BoxLayout:
+                            size_hint_x: .30
+                        Button:
+                            id: iniciarSesion
+                            background_normal: ''
+                            background_color: hex('#000000')  
+                            size_hint_x: .40
+                            text: 'Iniciar Sesión'
+                            font_size: '20sp'
+                            on_release: root.inicioDirecto()
+                        BoxLayout:
+                            size_hint_x: .30
+                    BoxLayout:
+                        size_hint_y: .13 
+            BoxLayout:
+                size_hint_x: .35
+        BoxLayout:
+            size_hint_y: .055
+    BoxLayout:
+        size_hint_y: .07
+        canvas.before:
+            Color: 
+                rgba: hex('2980B9')
+            Rectangle:
+                size: self.size
+                pos: self.pos 
+        
+    

@@ -1,0 +1,328 @@
+#:import hex kivy.utils.get_color_from_hex
+
+<RV_usuarios>:
+    SelectableRecycleBoxLayout:
+        spacing: 1
+        default_size: None, dp(35)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: True
+
+<SelectableUsuarioLabel>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: hex('C9F3EF') if self.selected else hex('#F0F0F0')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: _idUsuario
+        size_hint_x: .15
+        color: hex('000000')
+    Label:
+        id: _username
+        size_hint_x: .20
+        color: hex('000000')
+    Label:
+        id: _nombre
+        size_hint_x: .30
+        color: hex('000000')    
+    Label:
+        id: _telefono
+        size_hint_x: .18
+        color: hex('000000')    
+    Label:
+        id: _tipo
+        size_hint_x: .17
+        color: hex('000000')
+
+<LabelOscuro@Label>:
+    canvas.before:
+        Color:
+            rgba: hex('#21618C')
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+
+
+<VentanaUsuarios>:
+    size_hint: .4, .5
+    title: 'Usuarios'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 5
+        spacing: 8
+        BoxLayout:
+            size_hint_y: .1
+            padding: 3
+            Label:
+                id: notificacionVentanaUsuarios
+                text: 'Notificacion'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: .65
+            spacing: 2
+            BoxLayout:
+                size_hint_y: .25
+                spacing: 2
+                TextInput:
+                    size_hint_x: .4
+                    font_size: 15
+                    id: idUsuarioVentanaUsuarios
+                    hint_text: 'ID'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"          
+                TextInput:
+                    size_hint_x: .6
+                    font_size: 15
+                    id: nombreVentanaUsuarios
+                    hint_text: 'Nombre'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+            BoxLayout:
+                size_hint_y: .25
+                spacing: 2
+                TextInput:
+                    size_hint_x: .5
+                    font_size: 15
+                    id: usernameVentanaUsuarios
+                    hint_text: 'Username'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+                TextInput:
+                    size_hint_x: .5
+                    font_size: 15
+                    id: celularVentanaUsuarios
+                    hint_text: 'Telefono'
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+            BoxLayout:
+                size_hint_y: .25
+                spacing: 2
+                TextInput:
+                    size_hint_x: .7
+                    font_size: 15
+                    id: passwordVentanaUsuarios
+                    hint_text: 'Contraseña'
+                    password: True
+                    write_tab: False
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+                BoxLayout:
+                    size_hint_x: .35
+                    BoxLayout:
+                        size_hint_x: .3
+                    BoxLayout:
+                        size_hint_x: .2
+                        ToggleButton:  
+                            id: mostrarContraseña
+                            on_release: root.mostrarContraseña(self.state)
+                            background_color: 0,0,0,0
+                            Image:
+                                id: imagePassword
+                                source: 'img/eye-slash-regular.png'
+                                center_x: self.parent.center_x
+                                center_y: self.parent.center_y
+                    BoxLayout:
+                        size_hint_x: .35
+
+            BoxLayout:
+                size_hint_y: .25
+                spacing: 2
+                BoxLayout:
+                    size_hint_x: .12
+                BoxLayout:
+                    size_hint_x: .27
+                    Label:
+                        id: labelAdminVentanaUsuarios
+                        text: 'Admin'
+                    CheckBox:
+                        group: "tipo"
+                        id: adminValueCheckbox
+                BoxLayout:
+                    size_hint_x: .22
+                BoxLayout:
+                    size_hint_x: .27
+                    Label:
+                        id: labelEmpleadoVentanaUsuarios
+                        text: 'Empleado'
+                    CheckBox:
+                        group: "tipo"
+                        id: empleadoValueCheckbox
+                BoxLayout:
+                    size_hint_x: .12
+        BoxLayout:
+            size_hint_y: .25
+            spacing: 4
+            BotonNegro:
+                size_hint_x: .5
+                id: botonAgregarUsuario
+                font_size: 18
+                text: ''
+                #background_color: hex('10AA10')
+                on_release: root.validar(idUsuarioVentanaUsuarios.text,nombreVentanaUsuarios.text, usernameVentanaUsuarios.text, celularVentanaUsuarios.text,passwordVentanaUsuarios.text, mostrarContraseña.state ,adminValueCheckbox.active, empleadoValueCheckbox.active)
+            BotonNegro:
+                size_hint_x: .5
+                font_size: 18
+                text: 'Cancelar'
+                #background_color: hex('A0A0A0')
+                on_release: root.dismiss()  
+
+<UsuariosWindow>:
+    orientation: 'vertical'
+    BoxLayout:
+        size_hint_y: .1
+        canvas.before:
+            Color:
+                rgba: hex('2980B9')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            size_hint_x: .08
+            Image: 
+                source: 'img/LogoCuadrado.png' 
+        BoxLayout:
+            size_hint_x: .30 
+        Label:
+            size_hint_x: .22
+            text: 'Usuarios'
+            font_size: 28
+        BoxLayout: 
+            size_hint_x: .28
+        Button:
+            background_normal: ''
+            background_color: hex('DD0000')
+            size_hint_x: .12
+            font_size: 22
+            text: 'Cerrar Sesión'
+            on_release: root.cerrarSesion()
+    BoxLayout:
+        size_hint_y: .83
+        canvas.before:
+            Color:
+                rgba: hex('FFFFFF')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            size_hint_x: .20
+            canvas.before:
+                Color:
+                    rgba: hex('EEEEEE')
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            orientation: 'vertical'
+            spacing: 10
+            padding: 8
+            BoxLayout:
+                spacing: 5
+                size_hint_y: .30
+                orientation: 'vertical'
+                BoxLayout:
+                    size_hint_y: .5
+                    spacing: 5
+                    Button:
+                        text: 'Reportes'
+                        color: hex('000000')
+                        font_size: 25
+                        background_normal: ''
+                        background_color: hex('#8C6222')
+                        on_release: root.reportes()
+                    Button:
+                        color: hex('000000')
+                        font_size: 25
+                        text: 'Inventario'
+                        background_normal: ''
+                        background_color: hex('#00A5B1')
+                        on_release: root.inventario()
+                Button:
+                    size_hint_y: .5
+                    color: hex('000000')
+                    font_size: 25
+                    text: 'Ventas'
+                    background_normal: ''
+                    background_color: hex('#FFE818')
+                    on_release: root.ventas()
+            Button:
+                size_hint_y: .23
+                background_normal: ''
+                background_color: hex('26a72a')
+                color: hex('FFFFFF')
+                text: 'Agregar Usuario'
+                font_size: 28
+                on_release: root.agregarUsuario() 
+            Button:
+                size_hint_y: .23
+                background_normal: ''
+                background_color: hex('26a72a')
+                color: hex('FFFFFF')
+                text: 'Modificar Usuario'
+                font_size: 28
+                on_release: root.modificarUsuario()
+            Button:
+                size_hint_y: .23
+                background_normal: ''
+                background_color: hex('26a72a')
+                color: hex('FFFFFF')
+                text: 'Eliminar Usuario'
+                font_size: 28
+                on_release: root.eliminarUsuario()
+            BoxLayout
+                size_hint_y: .01
+        BoxLayout:
+            size_hint_x: .8
+            orientation: 'vertical'
+            canvas.before:
+                Color:
+                    rgba: hex('FFFFFF')
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            BoxLayout: 
+                size_hint_y: .05
+                spacing: 2
+                padding: 2
+                LabelOscuro:
+                    text: 'ID'
+                    size_hint_x: .15
+                LabelOscuro:
+                    text: 'Username'
+                    size_hint_x: .20
+                LabelOscuro:
+                    text: 'Nombre'
+                    size_hint_x: .30
+                LabelOscuro:
+                    text: 'Telefono'
+                    size_hint_x: .18
+                LabelOscuro:
+                    text: 'Tipo'
+                    size_hint_x: .17
+            RV_usuarios:
+                id: rv_usuarios
+                size_hint_y: .95
+                viewclass: 'SelectableUsuarioLabel'
+    BoxLayout:
+        size_hint_y: .07
+        canvas.before:
+            Color:
+                rgba: hex('2980B9')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+    

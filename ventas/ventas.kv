@@ -1,0 +1,444 @@
+#:import hex kivy.utils.get_color_from_hex
+#: import icon kivysome.icon
+
+<BotonNegro@Button>:
+    background_normal: ''
+    background_color: hex('#2980B9')  
+    markup: True
+    ltext: ""
+    rtext: ""
+
+<LabelOscuro@Label>:
+    canvas.before:
+        Color:
+            rgba: hex('#21618C')
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+
+<SelectableBoxLayout>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: hex('C9F3EF') if self.selected else hex('#F0F0F0')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: _numero
+        size_hint_x: .05
+        color: hex('000000')
+    Label:
+        id: _articulo
+        size_hint_x: .6
+        color: hex('000000')
+    Label:
+        id: _cantidad
+        size_hint_x: .1
+        color: hex('000000')    
+    Label:
+        id: _precioUnitario
+        size_hint_x: .1
+        color: hex('000000')    
+    Label:
+        id: _precio
+        size_hint_x: .15
+        color: hex('000000')
+
+<SelectableBoxLayoutVentanaNombre>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: hex('C9F3EF') if self.selected else hex('#F0F0F0')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: _codigoVentanaNombre
+        size_hint_x: .2
+        color: hex('000000')
+    Label:
+        id: _articuloVentanaNombre
+        size_hint_x: .5
+        color: hex('000000')
+    Label:
+        id: _cantidadVentanaNombre
+        size_hint_x: .15
+        color: hex('000000')    
+    Label:
+        id: _precioVentanaNombre
+        size_hint_x: .15
+        color: hex('000000')    
+
+<RV>:
+    SelectableRecycleBoxLayout:
+        spacing: 1
+        default_size: None, dp(35)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: True
+
+<VentanaCambiarArticulo>
+    size_hint: .4, .5
+    title: 'Productos'
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 7
+        BoxLayout:
+            spacing: 4
+            size_hint_y: .1
+            Label:
+                text: 'Producto:'
+                font_size: 16
+            Label:
+                text: 'Cantidad:'
+                font_size: 16
+        BoxLayout:
+            size_hint_y: .1
+            Label:
+                id: productoCambiar
+                font_size: 18
+            Label:
+                id: cantidadCambiar
+                font_size: 18 
+        Label:
+            size_hint_y: .1
+            id: notificacionCantidadCambiada
+            font_size: 18
+        BoxLayout:
+            size_hint_y: .05 
+        BoxLayout:
+            size_hint_y: .15
+            BoxLayout:
+                size_hint_x: .4
+            TextInput:
+                size_hint_x: .2
+                font_size: 18
+                id: cantidadNuevaCambiar
+                hint_text: 'Nueva Cantidad'
+                multiline: False
+                padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                halign: "center"
+                on_text_validate: root.validarNuevaCantidad(self.text, boton=False)
+            BoxLayout:
+                size_hint_x: .4
+        BoxLayout:
+            size_hint_y: .15
+        BoxLayout:
+            size_hint_y: .2
+            spacing: 6
+            BotonNegro:
+                size_hint_x: .5
+                id: cantidadNueva
+                font_size: 18
+                text: 'Cambiar'
+                #background_color: hex('10AA10')
+                on_release: root.validarNuevaCantidad(root.ids.cantidadNuevaCambiar.text, boton=True)
+            BotonNegro:
+                size_hint_x: .5
+                font_size: 18
+                text: 'Cancelar'
+                #background_color: hex('A0A0A0')
+                on_release: root.dismiss()
+
+<VentanaPagar>
+    size_hint: .4, .5
+    title: 'Pagar'
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: .25
+            BoxLayout:
+                size_hint_x: .5
+                orientation: 'vertical'
+                Label:
+                    text: 'Total a pagar:'
+                    font_size: 18
+                Label:
+                    id: total_ventana_Pagar
+                    font_size: 18
+            BoxLayout:
+                size_hint_x: .5
+                orientation: 'vertical'
+                Label:
+                    text: 'Recibido:'
+                    font_size: 18
+                TextInput:
+                    font_size: 18
+                    id: dinero_Recibido
+                    multiline: False
+                    padding_y: [self.height / 2.0 - (self.line_height / 2.0) * len(self._lines), 0]
+                    halign: "center"
+                    on_text_validate: root.mostrarCambio(self.text,False)
+        BoxLayout:
+            size_hint_y: .1
+        BoxLayout:
+            size_hint_y: .25
+            orientation: 'vertical'
+            Label:
+                text: 'Cambio:'
+                font_size: 18
+            Label:
+                id: cambio_ventana_pago
+                font_size: 18
+        BoxLayout:
+            size_hint_y: .1
+        BoxLayout:
+            size_hint_y: .25
+            spacing: 8
+            padding: 2
+            BotonNegro:
+                id: botonPagar
+                size_hint_x: .5
+                font_size: 18
+                text: 'Pagar'
+                on_release: root.mostrarCambio(dinero_Recibido.text,True)   
+            BotonNegro:
+                size_hint_x: .5
+                text: 'Cancelar'
+                font_size: 18
+                on_release: root.dismiss()   
+
+<ventanaProductoNombre>
+    size_hint: .5, .6
+    title: 'Productos'
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: .8
+            orientation: 'vertical'
+            BoxLayout:
+                size_hint_y: .1
+                Label:
+                    text:'Codigo'
+                    size_hint_x: .2
+                Label:
+                    text:'Nombre'
+                    size_hint_x: .5
+                Label:
+                    text:'Cantidad'
+                    size_hint_x: .15
+                Label:
+                    text:'Precio'
+                    size_hint_x: .15
+            BoxLayout:
+                size_hint_y: .9
+                RV:
+                    viewclass: 'SelectableBoxLayoutVentanaNombre'
+                    id: rvs
+        BoxLayout:
+            size_hint_y: .2
+            spacing: 6
+            BotonNegro:
+                text: 'Seleccionar'
+                on_release: root.seleccionarArticulo()
+            BotonNegro:
+                text: 'Salir'
+                on_release: root.dismiss()    
+
+
+
+<VentasWindow>:
+    canvas.before:
+        Color:
+            rgba: hex('EEEEEE')
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    orientation: 'vertical'
+    BoxLayout:
+        size_hint_y: .1
+        spacing: 3
+        canvas.before:
+            Color:
+                rgba: hex('EEEEEE')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            size_hint_x: .08
+            Image:
+                source: 'img/LogoCuadrado.png'
+        Label:
+            id: label_bienvenido
+            size_hint_x: .26
+            color: hex('000000')
+            text: ''
+            font_size: 18
+        GridLayout:
+            size_hint_x: .26
+            rows: 2
+            cols: 2
+            Label:
+                text: 'Fecha'
+                color: hex('000000')
+                font_size: 18
+            Label:
+                id: label_fecha
+                color: hex('000000')
+                font_size: 18
+            Label:
+                text: 'Hora'
+                color: hex('000000')
+                font_size: 18
+            Label:
+                id: label_hora      
+                color: hex('000000')
+                font_size: 18
+        Label:
+            size_hint_x: .13
+        BotonNegro:
+            id: boton_inventario
+            background_normal: ''
+            background_color: hex('FFE818')
+            color: hex('000000')
+            size_hint_x: .14
+            text: 'Inventario'
+            font_size: 20
+            on_release: root.inventario()
+            
+        BotonNegro:
+            id: boton_cerrarSesion 
+            font_size: 20
+            size_hint_x: .12
+            on_release: root.cerrarSesion()
+            background_color: hex('DD1010')
+            text: 'Cerrar Sesión'
+            ##icon: "fontawesome.icons['circle-check']"
+            ##ltext: ""
+            ##rtext: "Cerrar Sesión"
+            ##text: root.iconText(self.icon, self.ltext, self.rtext)
+    BoxLayout:
+        size_hint_y: .9
+        canvas.before:
+            Color:
+                rgba: hex('FFFFFF')
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        BoxLayout:
+            size_hint_x: .7
+            orientation: 'vertical'
+            spacing: 2
+            padding: 1
+            GridLayout:
+                spacing: 1
+                size_hint_y: .1
+                rows: 2
+                cols: 2
+                LabelOscuro:
+                    text: 'Buscar por Codigo'
+                LabelOscuro:
+                    text: 'Buscar por Nombre'
+                TextInput:
+                    id: buscarCodigo
+                    write_tab: False
+                    multiline: False
+                    on_text_validate: root.agregarProductoCodigo(self.text)
+                TextInput:
+                    id: buscarNombre
+                    write_tab: False
+                    multiline: False
+                    on_text_validate: root.agregarProductoNombre(self.text)
+            BoxLayout:
+                size_hint_y: .8
+                orientation: 'vertical'
+                BoxLayout:
+                    size_hint_y: .05
+                    spacing: .5
+                    LabelOscuro:    
+                        text: '#'
+                        size_hint_x: .05
+                    LabelOscuro:    
+                        text: 'Articulo'
+                        size_hint_x: .6
+                    LabelOscuro:    
+                        text: 'Cantidad'
+                        size_hint_x: .1
+                    LabelOscuro:    
+                        text: 'Precio unidad'
+                        size_hint_x: .1
+                    LabelOscuro:    
+                        text: 'Precio'
+                        size_hint_x: .15
+                RV:
+                    viewclass: 'SelectableBoxLayout'
+                    id: rvs
+            BoxLayout:
+                size_hint_y: .1
+                spacing: 3
+                #padding: 2
+                BotonNegro:
+                    id: eliminarArticulo
+                    text: 'Borrar Articulo'
+                    font_size: 20
+                    on_release: root.eliminarProducto()
+                BotonNegro:
+                    id: cambiarCantidad
+                    text: 'Cambiar Cantidad'
+                    font_size: 20  
+                    on_release: root.cambiarProducto()           
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_x: .25
+            padding: 2,2
+            spacing: .5  
+            canvas.before:
+                Color:
+                    rgba: hex('EEEEEE')
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            BoxLayout:  
+                canvas.before:
+                    Color:
+                        rgba: hex('000000')
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                size_hint_y: .3        
+                Label:
+                    text: 'Total'
+                    font_size: 18
+                Label:
+                    id: labelSubTotal
+                    font_size: 18
+                    text: '$ 0.00'
+            BoxLayout:
+                size_hint_y: .1
+            BoxLayout:
+                size_hint_y: .6
+                orientation: 'vertical'
+                spacing: 3
+                padding: 2
+                Label:
+                    id: TextoError
+                    size_hint_y: .25
+                    color: hex('DD0000')
+                    font_size: 20
+                Label:
+                    font_size: 20
+                    id: TextoExito
+                    size_hint_y: .25
+                    color: hex('00DD00')
+                BotonNegro:
+                    size_hint_y: .25
+                    id: pagar
+                    text: 'Pagar'
+                    font_size: 20
+                    background_color: hex('02BC02')
+                    on_release: root.pagar()
+                BotonNegro:
+                    size_hint_y: .25
+                    id: nuevaCompra
+                    text: 'Nueva Compra'
+                    font_size: 20
+                    background_normal: ''
+                    background_color: hex('2980B9')
+                    markup: True
+                    on_release: root.nuevaCompra()    
+
