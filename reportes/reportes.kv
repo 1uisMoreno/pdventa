@@ -222,6 +222,7 @@
             BoxLayout:
                 size_hint_y: .05
                 Label:
+                    id: labelNotificacion
                     text: 'Notificaciones'
                     color: hex('DD0000')
                     font_size: 18   
@@ -312,6 +313,7 @@
                 font_size: 20
                 background_normal: ''
                 background_color: hex('000000')
+                on_release: root.guardarCSV()
             Button:
                 size_hint_y: .15
                 text: 'Guardar en PDF'

@@ -1,4 +1,7 @@
+from dataclasses import field
 from datetime import datetime
+from functools import total_ordering
+from re import S
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.recycleview import RecycleView
@@ -13,6 +16,7 @@ from kivy.lang import Builder
 from kivy.uix.popup import Popup
 from sqlquerys import QuerisSQLite
 from datetime import datetime, timedelta
+import csv
 Builder.load_file('reportes/reportes.kv')
 
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
@@ -128,7 +132,7 @@ class RV_reportes_ventas(RecycleView):
 class ReportesWindow(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.venta=[]
+        
 
     def ventanaDetalles(self):
         indice=self.ids.rv_reportes_ventas.ventaSeleccionada()
@@ -138,6 +142,60 @@ class ReportesWindow(BoxLayout):
 
     def observaciones(self):
         pass
+
+    def guardarCSV(self):    
+        if self.ids.rv_reportes_ventas.data:
+            print("Guardar CSV")
+            print(self.ids.rv_reportes_ventas.data)
+            conexion = QuerisSQLite.crearConexion("pdventaDB.sqlite")
+            ventasDetallesQuery="SELECT * from detallesVentas WHERE idVenta=?"
+            if self.ids.labelFechaFinal.text:
+                nombreCSV="ventasCSV/"+self.ids.labelFechaInicial.text+" -- "+self.ids.labelFechaFinal.text+".csv"
+            else:
+                nombreCSV="ventasCSV/"+self.ids.labelFechaInicial.text+".csv"
+
+            productosCSV=[]
+            ventasLista = []
+            totalVendidoCSV=0
+            totalGanancia=0
+            for venta in self.ids.rv_reportes_ventas.data:
+                idTuple=(venta['idVenta'],)
+                ventas_sql = QuerisSQLite.lecturaQuery(conexion, ventasDetallesQuery,idTuple)
+                ventasLista.append(ventas_sql)
+            print("Ventas Lista",ventasLista)
+            for ventaList in ventasLista:
+                print("Venta Individual",ventaList)
+                for productoVendidoTuple in ventaList:
+                    print("Producto Tuple: ",productoVendidoTuple)
+                    productoCompletoQuery= "SELECT * FROM productos WHERE codigo=?"
+                    codigoTuple = (productoVendidoTuple[2],)
+                    productoSql = QuerisSQLite.lecturaQuery(conexion, productoCompletoQuery, codigoTuple)
+                    articuloEncontrado = next((articulo for articulo in productosCSV if articulo["Codigo"]==productoVendidoTuple[2]),None)
+                    totalVendidoCSV+=productoVendidoTuple[4]*productoVendidoTuple[5]
+                    cantidad=productoVendidoTuple[5]
+                    diferencia= productoVendidoTuple[4]-productoSql[0][2]
+                    totalGanancia+=cantidad*diferencia 
+                    print("Articulo Encontrado", articuloEncontrado)
+                    print("Total Vendido",totalVendidoCSV)
+                    if articuloEncontrado:
+                        articuloEncontrado["Cantidad"]+=productoVendidoTuple[5]
+                        articuloEncontrado["Precio Total"]+=productoVendidoTuple[4]*productoVendidoTuple[5]
+                        articuloEncontrado["Ganancia Total"]+=cantidad*diferencia    
+                    else:
+                        gananciaProducto=cantidad*diferencia  
+                        productosCSV.append({"Codigo": productoVendidoTuple[2], "Nombre":productoVendidoTuple[3],"Precio":productoSql[0][2], "Precio Publico":productoVendidoTuple[4],"Cantidad":productoVendidoTuple[5],"Precio Total":productoVendidoTuple[4]*productoVendidoTuple[5], "Ganancia Total":gananciaProducto})
+            encabezados=["Codigo","Nombre","Precio","Precio Publico","Cantidad","Precio Total","Ganancia Total"]
+            pie=[{"Precio Total":totalVendidoCSV, "Ganancia Total":totalGanancia}]
+            with open(nombreCSV, "w", encoding="UTF8",newline="") as archivo:
+                writer=csv.DictWriter(archivo, fieldnames=encabezados)
+                writer.writeheader()
+                writer.writerows(productosCSV)
+                writer.writerows(pie)
+            self.ids.labelNotificacion.text= 'CSV creado exitosamente'
+            print("ProductosCSV:",productosCSV)
+            print("Nombre archivo CSV",nombreCSV)
+        else:
+            print("RV vacio")
 
     def inventario(self):
         self.parent.parent.current='scrn_inventario'
@@ -160,10 +218,8 @@ class ReportesWindow(BoxLayout):
         fechaFin=datetime.strptime('31/12/2099','%d/%m/%Y')
 
         ventas=[]
-        productosVendidos=[]
 
         ventasQuery="""SELECT * from ventas WHERE fecha BETWEEN ? AND ?"""
-        detallesQuery="""SELECT * from detallesVentas WHERE idVenta = ?"""
 
         if opcion=='Dia':
             if self.ids.fechaUnicaVentanaReportes.text:
@@ -200,7 +256,8 @@ class ReportesWindow(BoxLayout):
                     entradaValida=False
             if entradaValida:
                 self.ids.labelFechaInicial.text=str(fechaInicio.strftime('%d-%m-%y'))
-                self.ids.labelFechaFinal.text=str(fechaFin.strftime('%d-%m-%y'))
+                fechaFinLabel=fechaFin-timedelta(days=1)
+                self.ids.labelFechaFinal.text=str(fechaFinLabel.strftime('%d-%m-%y'))
             self.ids.separadorFechas.text='--'
             self.ids.fechaLabel.text='Fechas: '
         if entradaValida:
