@@ -89,7 +89,8 @@ class QuerisSQLite:
             idVenta INTEGER NOT NULL,
             codigo INTEGER NOT NULL,
             nombre TEXT NOT NULL,
-            precio REAL NOT NULL,   
+            precio REAL NOT NULL,
+            precioPublico REAL NOT NULL,
             cantidad INTEGER NOT NULL,
             FOREIGN KEY (idVenta) REFERENCES ventas(idVenta),
             FOREIGN KEY (codigo) REFERENCES productos(codigo)
@@ -110,6 +111,7 @@ class QuerisSQLite:
         QuerisSQLite.ejecutarQuery(conexion,crearTablaDescuentos,tuple())
 
 if __name__ == '__main__':
+    QuerisSQLite()
     # ventas=[]
     # conexion = QuerisSQLite.crearConexion("pdventaDB.sqlite")
     # ventasDetallesQuery="SELECT * from detallesVentas WHERE idVenta=?"
@@ -121,11 +123,13 @@ if __name__ == '__main__':
     #         ventas.append({"idDetalle":venta[0],"idVenta":venta[1],"codigo":venta[2],"nombre":venta[3],"precioIndividual":venta[4],"cantidad":venta[5],"total":precioFinal})
     # print(ventas_sql)
     # print(ventas)
-    conexion = QuerisSQLite.crearConexion("pdventaDB.sqlite")
-    productoCompletoQuery= "SELECT * FROM productos WHERE codigo=?"
-    codigoTuple = (111,)
-    productoSql = QuerisSQLite.lecturaQuery(conexion, productoCompletoQuery, codigoTuple)
-    print(productoSql)
+
+
+    # conexion = QuerisSQLite.crearConexion("pdventaDB.sqlite")
+    # productoCompletoQuery= "SELECT * FROM productos WHERE codigo=?"
+    # codigoTuple = (111,)
+    # productoSql = QuerisSQLite.lecturaQuery(conexion, productoCompletoQuery, codigoTuple)
+    # print(productoSql)
 
 
     # from datetime import datetime, timedelta

@@ -338,7 +338,7 @@ class VentasWindow(BoxLayout):
         ventaTuple=(self.usuario['idUsuario'],self.total, self.totalProductos, self.fecha)
         venta_id=QuerisSQLite.ejecutarQuery(conexion,ventaQuery,ventaTuple)
 
-        detalleQuery="INSERT INTO detallesVentas (idVenta, codigo, nombre, precio, cantidad) VALUES (?, ?, ?, ?, ?)"
+        detalleQuery="INSERT INTO detallesVentas (idVenta, codigo, nombre, precio, precioPublico, cantidad) VALUES (?, ?, ?, ?, ?, ?)"
 
         actualizarInventario=[]
         for articulo in self.ids.rvs.data:
@@ -346,7 +346,7 @@ class VentasWindow(BoxLayout):
             if articulo['cantidadInventario']-articulo['cantidadCarrito']>=0:
                 cantidadNueva=articulo['cantidadInventario']-articulo['cantidadCarrito']
             tupleCantidadNueva=(cantidadNueva,articulo['codigo'])
-            detalleTuple=(venta_id,articulo["codigo"],articulo["nombre"],articulo["precioPublico"],articulo["cantidadCarrito"])
+            detalleTuple=(venta_id,articulo["codigo"],articulo["nombre"],articulo["precio"],articulo["precioPublico"],articulo["cantidadCarrito"])
             QuerisSQLite.ejecutarQuery(conexion,detalleQuery,detalleTuple)
             QuerisSQLite.ejecutarQuery(conexion,queryCanitdadNueva,tupleCantidadNueva)
 

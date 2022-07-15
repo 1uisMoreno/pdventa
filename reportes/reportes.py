@@ -1,7 +1,3 @@
-from dataclasses import field
-from datetime import datetime
-from functools import total_ordering
-from re import S
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.recycleview import RecycleView
@@ -11,13 +7,19 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.uix.behaviors import FocusBehavior
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.popup import Popup
-from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.uix.popup import Popup
+
 from sqlquerys import QuerisSQLite
 from datetime import datetime, timedelta
 import csv
+
+
 Builder.load_file('reportes/reportes.kv')
+
+
+
+
 
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
                                  RecycleBoxLayout):
@@ -61,7 +63,7 @@ class VentanaDetalles(Popup):
         if ventas_sql:
             for venta in ventas_sql:
                 precioFinal=float(venta[4])*float(venta[5])
-                ventas.append({"idDetalle":venta[0],"idVenta":venta[1],"codigo":venta[2],"nombre":venta[3],"precioIndividual":venta[4],"cantidad":venta[5],"total":precioFinal})
+                ventas.append({"idDetalle":venta[0],"idVenta":venta[1],"codigo":venta[2],"nombre":venta[3],"precioIndividual":venta[5],"cantidad":venta[6],"total":precioFinal})
         
         for data in ventas:
             self.ids.rv_detalles.data.append(data)
@@ -142,6 +144,8 @@ class ReportesWindow(BoxLayout):
 
     def observaciones(self):
         pass
+    
+
 
     def guardarCSV(self):    
         if self.ids.rv_reportes_ventas.data:
@@ -167,23 +171,20 @@ class ReportesWindow(BoxLayout):
                 print("Venta Individual",ventaList)
                 for productoVendidoTuple in ventaList:
                     print("Producto Tuple: ",productoVendidoTuple)
-                    productoCompletoQuery= "SELECT * FROM productos WHERE codigo=?"
-                    codigoTuple = (productoVendidoTuple[2],)
-                    productoSql = QuerisSQLite.lecturaQuery(conexion, productoCompletoQuery, codigoTuple)
                     articuloEncontrado = next((articulo for articulo in productosCSV if articulo["Codigo"]==productoVendidoTuple[2]),None)
-                    totalVendidoCSV+=productoVendidoTuple[4]*productoVendidoTuple[5]
-                    cantidad=productoVendidoTuple[5]
-                    diferencia= productoVendidoTuple[4]-productoSql[0][2]
+                    totalVendidoCSV+=productoVendidoTuple[5]*productoVendidoTuple[6]
+                    cantidad=productoVendidoTuple[6]
+                    diferencia= productoVendidoTuple[5]-productoVendidoTuple[4]
                     totalGanancia+=cantidad*diferencia 
                     print("Articulo Encontrado", articuloEncontrado)
                     print("Total Vendido",totalVendidoCSV)
                     if articuloEncontrado:
-                        articuloEncontrado["Cantidad"]+=productoVendidoTuple[5]
-                        articuloEncontrado["Precio Total"]+=productoVendidoTuple[4]*productoVendidoTuple[5]
+                        articuloEncontrado["Cantidad"]+=productoVendidoTuple[6]
+                        articuloEncontrado["Precio Total"]+=productoVendidoTuple[5]*productoVendidoTuple[6]
                         articuloEncontrado["Ganancia Total"]+=cantidad*diferencia    
                     else:
                         gananciaProducto=cantidad*diferencia  
-                        productosCSV.append({"Codigo": productoVendidoTuple[2], "Nombre":productoVendidoTuple[3],"Precio":productoSql[0][2], "Precio Publico":productoVendidoTuple[4],"Cantidad":productoVendidoTuple[5],"Precio Total":productoVendidoTuple[4]*productoVendidoTuple[5], "Ganancia Total":gananciaProducto})
+                        productosCSV.append({"Codigo": productoVendidoTuple[2], "Nombre":productoVendidoTuple[3],"Precio":productoVendidoTuple[4], "Precio Publico":productoVendidoTuple[5],"Cantidad":productoVendidoTuple[6],"Precio Total":productoVendidoTuple[5]*productoVendidoTuple[6], "Ganancia Total":gananciaProducto})
             encabezados=["Codigo","Nombre","Precio","Precio Publico","Cantidad","Precio Total","Ganancia Total"]
             pie=[{"Precio Total":totalVendidoCSV, "Ganancia Total":totalGanancia}]
             with open(nombreCSV, "w", encoding="UTF8",newline="") as archivo:
