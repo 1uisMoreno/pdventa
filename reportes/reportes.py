@@ -13,12 +13,36 @@ from kivy.uix.popup import Popup
 from sqlquerys import QuerisSQLite
 from datetime import datetime, timedelta
 import csv
-
+from fpdf import FPDF
+import estilosPDF as estilo
 
 Builder.load_file('reportes/reportes.kv')
 
 
+class PDF(FPDF):
 
+    def header(self):
+        self.image('img/LogoCircular.png', x = 13, y = 13, w = 36, h = 26)
+        estilo.color_texto(self,'Negro')
+        self.set_font('Times', 'B', 30)
+        estilo.tamaño_texto(self, 25)
+        self.cell(w = 0, h = 16, txt = 'PAPELERIA TONATIUH', border = 0, ln=1,
+                align = 'C', fill = 0)
+        self.set_font('Courier', 'B', 18)
+        estilo.color_texto(self,'Negro')
+        estilo.tamaño_texto(self, 18)   
+        self.cell(w = 0, h = 14, txt = 'Reporte de Ventas', border = 0, ln=2,
+                align = 'C', fill = 0)   
+        self.ln(8)
+
+    def footer(self):
+
+        self.set_y(-20)
+
+        self.set_font('Arial', 'I', 12)
+
+        self.cell(w = 0, h = 10, txt =  'Pagina ' + str(self.page_no()) + '/{nb}', border = 0,
+                align = 'C', fill = 0)   
 
 
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
@@ -112,7 +136,7 @@ class RV_reportes_ventas(RecycleView):
     def __init__(self, **kwargs):
         super(RV_reportes_ventas, self).__init__(**kwargs)
         self.data = []
-#{"idVenta":58987,"idUsuario":20166536,"productosVendidos":6,"total":500,"hora":"12:20","fecha":"10/05/2022"}
+
     def agregarDatos(self, datos):
         for dato in datos:
             dato['seleccionado']=False
@@ -141,23 +165,135 @@ class ReportesWindow(BoxLayout):
         if indice>=0:
             ventanaDetalles=VentanaDetalles()
             ventanaDetalles.mostrar(self.ids.rv_reportes_ventas.data[indice])
+        else:
+            self.ids.labelNotificacion.text='Venta no seleccionada'
 
     def observaciones(self):
         pass
     
+    def crearPDF(self):
+        if self.ids.rv_reportes_ventas.data:
+            conexion = QuerisSQLite.crearConexion("pdventaDB.sqlite")
+            ventasDetallesQuery="SELECT * from detallesVentas WHERE idVenta=?"
+            fechaInicial=self.ids.labelFechaInicial.text
+            fechaFinal=self.ids.labelFechaFinal.text
 
+            fechaAhora = datetime.now()
+            fechaAhora = fechaAhora.strftime("%d/%m/%y")
+            fecha_creacion_pdf="Creado el "+str(fechaAhora)
+            fechaInicial=datetime.strptime(fechaInicial,'%d-%m-%y')
+            fechaInicial=str(fechaInicial.strftime('%d/%m/%Y'))
+
+
+            if self.ids.labelFechaFinal.text:
+                nombrePDF="ventasPDF/"+self.ids.labelFechaInicial.text+" -- "+self.ids.labelFechaFinal.text+".pdf"
+                fechaFinal=datetime.strptime(fechaFinal,'%d-%m-%y')
+                fechaFinal=str(fechaFinal.strftime('%d/%m/%Y'))
+                fechasSTR= "Fechas: "+fechaInicial+" -- "+fechaFinal
+            else:
+                nombrePDF="ventasPDF/"+self.ids.labelFechaInicial.text+".pdf"
+                fechasSTR= "Fecha: "+fechaInicial
+            productosPDF=[]
+            ventasLista = []
+            totalVendidoPDF=0
+            totalGanancia=0
+            for venta in self.ids.rv_reportes_ventas.data:
+                idTuple=(venta['idVenta'],)
+                ventas_sql = QuerisSQLite.lecturaQuery(conexion, ventasDetallesQuery,idTuple)
+                ventasLista.append(ventas_sql)    
+            for ventaList in ventasLista:
+                for productoVendidoTuple in ventaList:
+                    articuloEncontrado = next((articulo for articulo in productosPDF if articulo["Codigo"]==productoVendidoTuple[2]),None)
+                    totalVendidoPDF+=productoVendidoTuple[5]*productoVendidoTuple[6]
+                    cantidad=productoVendidoTuple[6]
+                    diferencia= productoVendidoTuple[5]-productoVendidoTuple[4]
+                    totalGanancia+=cantidad*diferencia
+                    if articuloEncontrado:
+                        articuloEncontrado["Cantidad"]+=productoVendidoTuple[6]
+                        articuloEncontrado["Precio Total"]+=productoVendidoTuple[5]*productoVendidoTuple[6]
+                        articuloEncontrado["Ganancia Total"]+=cantidad*diferencia    
+                    else:
+                        gananciaProducto=cantidad*diferencia  
+                        productosPDF.append({"Codigo": productoVendidoTuple[2], "Nombre":productoVendidoTuple[3],"Precio":productoVendidoTuple[4], "Precio Publico":productoVendidoTuple[5],"Cantidad":productoVendidoTuple[6],"Precio Total":productoVendidoTuple[5]*productoVendidoTuple[6], "Ganancia Total":gananciaProducto})
+            print(productosPDF)
+            print(nombrePDF)
+            print(fecha_creacion_pdf)
+            print(fechasSTR)
+            pdf = PDF()
+            pdf.alias_nb_pages()
+            pdf.add_page()
+            pdf.set_font('Arial', 'I', 12)
+            estilo.color_texto(pdf,'Rojo')
+            pdf.cell(w = 0, h = 10, txt = fecha_creacion_pdf, border = 0, ln=1,
+                    align = 'R', fill = 0)
+            
+            pdf.cell(w = 0, h = 10, txt = fechasSTR, border = 0, ln=1,
+                    align = 'L', fill = 0)
+            pdf.ln(5)
+            pdf.set_font('Arial', 'B', 12)
+            estilo.color_texto(pdf,'Negro')
+            estilo.color_fondo(pdf,'Azul Inicio Tabla')
+            pdf.cell(w = 35, h = 10, txt = 'Código', border = 0,
+                    align = 'C', fill = 1)
+            
+            pdf.cell(w = 95, h = 10, txt = 'Nombre', border = 0,
+                    align = 'C', fill = 1)
+            
+            pdf.cell(w = 18, h = 10, txt = 'Precio', border = 0,
+                    align = 'C', fill = 1)
+            
+            pdf.cell(w = 24, h = 10, txt = 'Cantidad', border = 0,
+                    align = 'C', fill = 1)
+            
+            pdf.multi_cell(w = 18, h = 10, txt = 'Total', border = 0,
+                    align = 'C', fill = 1)
+            pdf.set_font('Arial', '', 10)
+            for ix,producto in enumerate(productosPDF):
+                if ix%2==0:
+                    estilo.color_fondo(pdf,'Blanco')
+                    pdf.cell(w = 35, h = 10, txt = str(producto["Codigo"]), border = 0,
+                            align = 'C', fill = 1)
+                
+                    pdf.cell(w = 95, h = 10, txt = producto["Nombre"], border = 0,
+                            align = 'C', fill = 1)
+                    
+                    pdf.cell(w = 18, h = 10, txt = str(producto["Precio Publico"]), border = 0,
+                            align = 'C', fill = 1)
+                    
+                    pdf.cell(w = 24, h = 10, txt = str(producto["Cantidad"]), border = 0,
+                            align = 'C', fill = 1)
+                    
+                    pdf.multi_cell(w = 18, h = 10, txt = str(producto["Precio Total"]), border = 0,
+                            align = 'C', fill = 1)
+                else:
+                    estilo.color_fondo(pdf,'Azul Cielo Tabla')
+                    pdf.cell(w = 35, h = 10, txt = str(producto["Codigo"]), border = 0,
+                            align = 'C', fill = 1)
+                
+                    pdf.cell(w = 95, h = 10, txt = producto["Nombre"], border = 0,
+                            align = 'C', fill = 1)
+                    
+                    pdf.cell(w = 18, h = 10, txt = str(producto["Precio Publico"]), border = 0,
+                            align = 'C', fill = 1)
+                    
+                    pdf.cell(w = 24, h = 10, txt = str(producto["Cantidad"]), border = 0,
+                            align = 'C', fill = 1)
+                    
+                    pdf.multi_cell(w = 18, h = 10, txt = str(producto["Precio Total"]), border = 0,
+                            align = 'C', fill = 1)
+            pdf.output(nombrePDF)
+            print("Archivo PDF creado exitosamente")
+        else:
+            self.ids.labelNotificacion.text='No hay datos que guardar'
 
     def guardarCSV(self):    
         if self.ids.rv_reportes_ventas.data:
-            print("Guardar CSV")
-            print(self.ids.rv_reportes_ventas.data)
             conexion = QuerisSQLite.crearConexion("pdventaDB.sqlite")
             ventasDetallesQuery="SELECT * from detallesVentas WHERE idVenta=?"
             if self.ids.labelFechaFinal.text:
                 nombreCSV="ventasCSV/"+self.ids.labelFechaInicial.text+" -- "+self.ids.labelFechaFinal.text+".csv"
             else:
                 nombreCSV="ventasCSV/"+self.ids.labelFechaInicial.text+".csv"
-
             productosCSV=[]
             ventasLista = []
             totalVendidoCSV=0
@@ -165,19 +301,14 @@ class ReportesWindow(BoxLayout):
             for venta in self.ids.rv_reportes_ventas.data:
                 idTuple=(venta['idVenta'],)
                 ventas_sql = QuerisSQLite.lecturaQuery(conexion, ventasDetallesQuery,idTuple)
-                ventasLista.append(ventas_sql)
-            print("Ventas Lista",ventasLista)
+                ventasLista.append(ventas_sql)    
             for ventaList in ventasLista:
-                print("Venta Individual",ventaList)
                 for productoVendidoTuple in ventaList:
-                    print("Producto Tuple: ",productoVendidoTuple)
                     articuloEncontrado = next((articulo for articulo in productosCSV if articulo["Codigo"]==productoVendidoTuple[2]),None)
                     totalVendidoCSV+=productoVendidoTuple[5]*productoVendidoTuple[6]
                     cantidad=productoVendidoTuple[6]
                     diferencia= productoVendidoTuple[5]-productoVendidoTuple[4]
-                    totalGanancia+=cantidad*diferencia 
-                    print("Articulo Encontrado", articuloEncontrado)
-                    print("Total Vendido",totalVendidoCSV)
+                    totalGanancia+=cantidad*diferencia
                     if articuloEncontrado:
                         articuloEncontrado["Cantidad"]+=productoVendidoTuple[6]
                         articuloEncontrado["Precio Total"]+=productoVendidoTuple[5]*productoVendidoTuple[6]
@@ -193,22 +324,8 @@ class ReportesWindow(BoxLayout):
                 writer.writerows(productosCSV)
                 writer.writerows(pie)
             self.ids.labelNotificacion.text= 'CSV creado exitosamente'
-            print("ProductosCSV:",productosCSV)
-            print("Nombre archivo CSV",nombreCSV)
         else:
-            print("RV vacio")
-
-    def inventario(self):
-        self.parent.parent.current='scrn_inventario'
-
-    def usuarios(self):
-        self.parent.parent.current='scrn_usuarios'
-
-    def ventas(self):
-        self.parent.parent.current='scrn_ventas'
-
-    def cerrarSesion(self):
-        self.parent.parent.current='scrn_login'
+            self.ids.labelNotificacion.text='No hay datos que guardar'
 
     def cargarVentasRV(self, opcion=None):
         self.ids.rv_reportes_ventas.data=[]
@@ -217,19 +334,19 @@ class ReportesWindow(BoxLayout):
         final_sum=0
         fechaInicio=datetime.strptime('01/01/00', '%d/%m/%y')
         fechaFin=datetime.strptime('31/12/2099','%d/%m/%Y')
-
+        self.ids.labelNotificacion.text= ''
         ventas=[]
 
         ventasQuery="""SELECT * from ventas WHERE fecha BETWEEN ? AND ?"""
 
         if opcion=='Dia':
             if self.ids.fechaUnicaVentanaReportes.text:
-                print(self.ids.fechaUnicaVentanaReportes.text)
                 fecha=self.ids.fechaUnicaVentanaReportes.text
                 try:
                     fechaElegida=datetime.strptime(fecha,'%d/%m/%y')
                 except:
                     entradaValida=False
+                    self.ids.labelNotificacion.text= 'Fecha no valida'
                 if entradaValida:
                     fechaInicio=fechaElegida
                     fechaFin=fechaElegida+timedelta(days=1)
@@ -248,6 +365,7 @@ class ReportesWindow(BoxLayout):
                     fechaInicio=datetime.strptime(fecha,'%d/%m/%y')
                 except:
                     entradaValida=False
+                    self.ids.labelNotificacion.text= 'Fecha inicial no valida'
             if self.ids.rangoFechaFinVentanaReportes.text:
                 fecha=self.ids.rangoFechaFinVentanaReportes.text
                 try:
@@ -255,6 +373,10 @@ class ReportesWindow(BoxLayout):
                     fechaFin=fechaFin+timedelta(days=1)
                 except:
                     entradaValida=False
+                    self.ids.labelNotificacion.text= 'Fecha final no valida'
+            if fechaInicio>fechaFin:
+                entradaValida=False
+                self.ids.labelNotificacion.text= 'Entrada no valida'
             if entradaValida:
                 self.ids.labelFechaInicial.text=str(fechaInicio.strftime('%d-%m-%y'))
                 fechaFinLabel=fechaFin-timedelta(days=1)
@@ -274,6 +396,17 @@ class ReportesWindow(BoxLayout):
         self.ids.rangoFechaFinVentanaReportes.text=''
         self.ids.fechaUnicaVentanaReportes.text=''
 
+    def inventario(self):
+        self.parent.parent.current='scrn_inventario'
+
+    def usuarios(self):
+        self.parent.parent.current='scrn_usuarios'
+
+    def ventas(self):
+        self.parent.parent.current='scrn_ventas'
+
+    def cerrarSesion(self):
+        self.parent.parent.current='scrn_login'
 class ReportesApp(App):
     def build(self):
         return ReportesWindow()
