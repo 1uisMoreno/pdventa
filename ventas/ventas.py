@@ -1,3 +1,4 @@
+import imp
 from kivy.core.window import Keyboard,Window
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -242,6 +243,68 @@ class VentanaPagar(Popup):
         self.pagoRealizado()
         self.dismiss()
 
+class ventanaDescuentos(Popup):
+    def __init__(self, totalDeLaVenta,**kwargs):
+        super(ventanaDescuentos, self).__init__(**kwargs)
+        self.ids.textInputDescuento.disabled=True
+        self.total= totalDeLaVenta
+        self.ids.confirmarDescuento.disabled=True
+    
+    def opcionPorcentaje(self, estado):
+        if estado=='normal':
+            self.ids.textInputDescuento.disabled=True
+            self.ids.textInputDescuento.text=""
+            self.ids.confirmarDescuento.disabled=True
+        elif estado=='down':
+            print("Opcion porcentaje")
+            self.ids.textInputDescuento.disabled=False
+            self.ids.textInputDescuento.input_filter="int"
+            self.ids.textInputDescuento.text=""
+            self.ids.textInputDescuento.focus=True
+    
+    def opcionNumero(self, estado):
+        if estado=='normal':
+            self.ids.textInputDescuento.disabled=True
+            self.ids.textInputDescuento.text=""
+            self.ids.confirmarDescuento.disabled=True
+        elif estado=='down':
+            print("Opcion numero")
+            self.ids.textInputDescuento.disabled=False
+            self.ids.textInputDescuento.input_filter="float"
+            self.ids.textInputDescuento.text=""
+            self.ids.textInputDescuento.focus=True
+
+    def validarDescuento(self, descuento, opcionPorcentaje, opcionNumero, boton=False):
+        print(self.total)
+        print("Validar Descuento", descuento, opcionPorcentaje, opcionNumero)
+        if opcionPorcentaje=="down":
+            descuento = float(descuento)
+            if descuento>0 and descuento<=100:
+                self.ids.confirmarDescuento.disabled=False
+                if boton==True:
+                    totalFinal=(descuento*self.total)/100
+                    totalFinal= "{:.2f}".format(totalFinal)
+                    print(totalFinal, boton)
+                else:
+                    pass
+            else:
+                self.ids.confirmarDescuento.disabled=True
+                self.ids.notificacionDescuento.text="Descuento no valido"
+                
+        if opcionNumero=="down":
+            descuento = float(descuento)
+            if descuento>0 and descuento<=self.total:
+                self.ids.confirmarDescuento.disabled=False
+                if boton==True:
+                    totalFinal=self.total-float(descuento)
+                    totalFinal= "{:.2f}".format(totalFinal)
+                    print(totalFinal, boton)
+                else:
+                    pass
+            else:
+                self.ids.confirmarDescuento.disabled=True
+                self.ids.notificacionDescuento.text="Descuento no valido"
+
 class VentasWindow(BoxLayout):
     usuario=None
     def __init__(self, apuntador_Actualizar_Inventario,**kwargs):
@@ -325,6 +388,11 @@ class VentasWindow(BoxLayout):
                 ventanaPagar.mostrarPago()
         else:  
             self.ids.TextoError.text= 'No hay nada que pagar'
+
+    def descuentos(self):
+        print("Descuentos")
+        descuentos = ventanaDescuentos(self.total)
+        descuentos.open()
 
     def pagado(self):
         conexion = QuerisSQLite.crearConexion("pdventaDB.sqlite")

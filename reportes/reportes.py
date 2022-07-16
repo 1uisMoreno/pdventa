@@ -182,13 +182,13 @@ class ReportesWindow(BoxLayout):
             fechaAhora = fechaAhora.strftime("%d/%m/%y")
             fecha_creacion_pdf="Creado el "+str(fechaAhora)
             fechaInicial=datetime.strptime(fechaInicial,'%d-%m-%y')
-            fechaInicial=str(fechaInicial.strftime('%d/%m/%Y'))
+            fechaInicial=str(fechaInicial.strftime('%d/%m/%y'))
 
 
             if self.ids.labelFechaFinal.text:
                 nombrePDF="ventasPDF/"+self.ids.labelFechaInicial.text+" -- "+self.ids.labelFechaFinal.text+".pdf"
                 fechaFinal=datetime.strptime(fechaFinal,'%d-%m-%y')
-                fechaFinal=str(fechaFinal.strftime('%d/%m/%Y'))
+                fechaFinal=str(fechaFinal.strftime('%d/%m/%y'))
                 fechasSTR= "Fechas: "+fechaInicial+" -- "+fechaFinal
             else:
                 nombrePDF="ventasPDF/"+self.ids.labelFechaInicial.text+".pdf"
