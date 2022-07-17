@@ -18,6 +18,10 @@ Ventas:
 
 ![Alt Text](https://github.com/1uisMoreno/pdventa/blob/master/Capturas%20pdventa/Ventas.PNG)
 
+Inventario:
+
+![Alt Text](https://github.com/1uisMoreno/pdventa/blob/master/Capturas%20pdventa/Inventario.PNG)
+
 Usuarios:
 
 ![Alt Text](https://github.com/1uisMoreno/pdventa/blob/master/Capturas%20pdventa/Usuarios.PNG)
