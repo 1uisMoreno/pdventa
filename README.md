@@ -10,3 +10,22 @@ La base de datos utilizada es SQLite https://www.sqlite.org/index.html
 
 Capturas del proyecto:
 
+Login:
+
+![Alt Text](https://github.com/1uisMoreno/pdventa/blob/master/Capturas%20pdventa/Login.PNG)
+
+Ventas:
+
+![Alt Text](https://github.com/1uisMoreno/pdventa/blob/master/Capturas%20pdventa/Ventas.PNG)
+
+Usuarios:
+
+![Alt Text](https://github.com/1uisMoreno/pdventa/blob/master/Capturas%20pdventa/Usuarios.PNG)
+
+Reportes:
+
+![Alt Text](https://github.com/1uisMoreno/pdventa/blob/master/Capturas%20pdventa/Reportes.PNG)
+
+Reportes de ventas (PDF y CSV):
+
+![Alt Text](https://github.com/1uisMoreno/pdventa/blob/master/Capturas%20pdventa/ReportesPDFyCSV.PNG)
